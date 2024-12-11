@@ -10,6 +10,22 @@
                         size="normal" 
                         @click="incidentDialog = true" 
                     />
+                    <Button 
+                        type="button" 
+                        @click="toggleDarkMode" 
+                        rounded 
+                        :icon="isDarkTheme ? 'pi pi-moon' : 'pi pi-sun'" 
+                        severity="secondary" 
+                    />
+                    <div class="relative" style="z-index: 2">
+                        <Button
+                            icon="pi pi-palette"
+                            v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
+                            type="button"
+                            rounded
+                        />
+                        <AppConfigurator />
+                    </div>
                 </div>
             </template>
         </Menubar>
@@ -60,11 +76,20 @@
 </template>
 
 <script>
+import AppConfigurator from '@/layout/AppConfigurator.vue';
+
+import { useLayout } from '@/layout/composables/layout';
 import { useToast } from 'primevue/usetoast';
 
 export default {
+    components: {
+        AppConfigurator
+    },
     data() {
+        const { toggleDarkMode, isDarkTheme } = useLayout();
         return {
+            toggleDarkMode,
+            isDarkTheme,
             items: [
                 {
                     label: 'SGP',
