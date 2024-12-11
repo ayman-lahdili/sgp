@@ -9,7 +9,8 @@ export default {
     return {
       email: '',
       password: '',
-      checked: false
+      checked: false,
+      role: 'employee',
     };
   },
   methods: {
@@ -17,6 +18,7 @@ export default {
       if (this.email && this.password) {
         // Store the email in localStorage
         localStorage.setItem('user', this.email);
+        localStorage.setItem('role', this.role);
         
         // Redirect to the homepage (or desired route)
         this.$router.push('/');
@@ -44,24 +46,38 @@ export default {
                             />
                         </svg>
                         <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Système de Gestion de Pompe</div>
-                        <span class="text-muted-color font-medium">Sign in to continue</span>
+                        <span class="text-muted-color font-medium">Connectez vous</span>
                     </div>
 
                     <div>
-                        <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
+                        <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Courriel</label>
                         <InputText id="email1" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-8" v-model="email" />
 
-                        <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+                        <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Mot de passe</label>
                         <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
+
+                        <div class="flex flex-col gap-4 mb-8">
+                          <label class="block text-surface-900 dark:text-surface-0 font-medium text-xl">Rôle</label>
+                          <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                              <RadioButton v-model="role" inputId="size_normal" name="size" value="employee" size="small" />
+                              <label for="size_small" class="text-sm">Employé</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                              <RadioButton v-model="role" inputId="size_normal" name="size" value="administrateur" size="small" />
+                              <label for="size_small" class="text-sm">Administrateur</label>
+                            </div>
+                          </div>
+                        </div>
 
                         <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                             <div class="flex items-center">
                                 <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
-                                <label for="rememberme1">Remember me</label>
+                                <label for="rememberme1">Se rappeler de moi</label>
                             </div>
-                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Mot de passe oublié ?</span>
                         </div>
-                        <Button label="Sign In" class="w-full" @click="handleSignIn"></Button>
+                        <Button label="Connection" class="w-full" @click="handleSignIn"></Button>
                     </div>
                 </div>
             </div>
