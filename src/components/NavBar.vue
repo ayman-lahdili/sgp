@@ -1,0 +1,177 @@
+<template>
+    <div class="card">
+        <Menubar :model="items">
+            <template #end>
+                <div class="flex items-center gap-2">
+                    <Button 
+                        label="Signaler un incident" 
+                        severity="danger" 
+                        variant="outlined" 
+                        size="normal" 
+                        @click="incidentDialog = true" 
+                    />
+                </div>
+            </template>
+        </Menubar>
+
+        <!-- Dialog for Reporting an Incident -->
+        <Dialog v-model:visible="incidentDialog" header="Signaler un incident" :style="{ width: '450px' }" :modal="true">
+            <div class="flex flex-col gap-4">
+                <!-- License Plate and Transaction Number in the same row -->
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label for="license-plate" class="block font-bold mb-2">Plaque d'immatriculation</label>
+                        <InputText 
+                            id="license-plate" 
+                            v-model="incident.licensePlate" 
+                            placeholder="123-ABC" 
+                        />
+                    </div>
+                    <div class="flex-1">
+                        <label for="transaction-number" class="block font-bold mb-2">Numéro de transaction</label>
+                        <InputText 
+                            id="transaction-number" 
+                            v-model="incident.transactionNumber" 
+                            placeholder="Numéro de transaction" 
+                            :class="{ 'p-invalid': submitted && !incident.transactionNumber }"
+                        />
+                        <small v-if="submitted && !incident.transactionNumber" class="p-error">Ce champ est requis.</small>
+                    </div>
+                </div>
+                
+                <!-- Observations textarea -->
+                <div>
+                    <label for="observations" class="block font-bold mb-2">Observations</label>
+                    <Textarea 
+                        id="observations" 
+                        v-model="incident.observations" 
+                        rows="6" 
+                        placeholder="Décrivez l'incident" 
+                        :style="{ width: '100%' }" 
+                    />
+                </div>
+            </div>
+            <template #footer>
+                <Button label="Annuler" icon="pi pi-times" text @click="resetIncidentForm" />
+                <Button label="Soumettre" icon="pi pi-check" @click="submitIncident" />
+            </template>
+        </Dialog>
+    </div>
+</template>
+
+<script>
+import { useToast } from 'primevue/usetoast';
+
+export default {
+    data() {
+        return {
+            items: [
+                {
+                    label: 'SGP',
+                    command: () => {
+                        this.$router.push('/');
+                    },
+                },
+                {
+                    label: 'Pompe',
+                    icon: 'pi pi-fw pi-car',
+                    command: () => {
+                        this.$router.push('/pump');
+                    },
+                },
+                {
+                    label: 'Réservoirs',
+                    icon: 'pi pi-fw pi-truck',
+                    command: () => {
+                        this.$router.push('/reservoir');
+                    },
+                },
+                {
+                    label: 'Historique des Transactions',
+                    icon: 'pi pi-fw pi-wallet',
+                    command: () => {
+                        this.$router.push('/transactions');
+                    },
+                },
+                {
+                    label: 'Utilisateur',
+                    icon: 'pi pi-fw pi-users',
+                    command: () => {
+                        this.$router.push('/users');
+                    },
+                },
+                {
+                    label: 'Paramètre',
+                    icon: 'pi pi-fw pi-cog',
+                    command: () => {
+                        this.$router.push('/settings');
+                    },
+                },
+                {
+                    label: '',
+                    icon: 'pi pi-fw pi-user',
+                    items: [
+                        {
+                            label: 'Modifier son compte',
+                            icon: 'pi pi-fw pi-cog',
+                            command: () => {
+                                this.$router.push('/user');
+                            },
+                        },
+                        {
+                            label: 'Se déconnecter',
+                            icon: 'pi pi-fw pi-sign-out',
+                            command: () => {
+                                localStorage.clear();
+                                this.$router.push('/login');
+                            },
+                        },
+                    ],
+                },
+            ],
+            incidentDialog: false,
+            incident: {
+                licensePlate: '',
+                transactionNumber: '',
+                observations: '',
+            },
+            submitted: false,
+            toast: null,
+        };
+    },
+    mounted() {
+        this.toast = useToast();
+    },
+    methods: {
+        submitIncident() {
+            this.submitted = true;
+
+            if (!this.incident.transactionNumber) {
+                this.toast.add({
+                    severity: 'error',
+                    summary: 'Erreur',
+                    detail: 'Le numéro de transaction est requis.',
+                    life: 3000,
+                });
+                return;
+            }
+
+            console.log('Incident Signalé:', this.incident);
+
+            this.toast.add({
+                severity: 'success',
+                summary: 'Succès',
+                detail: 'Incident signalé avec succès.',
+                life: 3000,
+            });
+            this.incidentDialog = false;
+            this.incident = {
+                licensePlate: '',
+                transactionNumber: '',
+                observations: '',
+            };
+            this.submitted = false;
+        },
+    },
+};
+</script>
