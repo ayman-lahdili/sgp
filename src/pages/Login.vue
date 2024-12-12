@@ -2,31 +2,31 @@
 import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
 
 export default {
-  components: {
-    FloatingConfigurator
-  },
-  data() {
-    return {
-      email: '',
-      password: '',
-      checked: false,
-      role: 'employee',
-    };
-  },
-  methods: {
-    handleSignIn() {
-      if (this.email && this.password) {
-        // Store the email in localStorage
-        localStorage.setItem('user', this.email);
-        localStorage.setItem('role', this.role);
-        
-        // Redirect to the homepage (or desired route)
-        this.$router.push('/');
-      } else {
-        console.error("Email and password are required!");
-      }
+    components: {
+        FloatingConfigurator
+    },
+    data() {
+        return {
+            email: '',
+            password: '',
+            checked: false,
+            role: 'employee'
+        };
+    },
+    methods: {
+        handleSignIn() {
+            if (this.email && this.password) {
+                // Store the email in localStorage
+                localStorage.setItem('user', this.email);
+                localStorage.setItem('role', this.role);
+
+                // Redirect to the homepage (or desired route)
+                this.$router.push('/');
+            } else {
+                console.error('Email and password are required!');
+            }
+        }
     }
-  }
 };
 </script>
 
@@ -57,17 +57,17 @@ export default {
                         <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
 
                         <div class="flex flex-col gap-4 mb-8">
-                          <label class="block text-surface-900 dark:text-surface-0 font-medium text-xl">Rôle</label>
-                          <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2">
-                              <RadioButton v-model="role" inputId="size_normal" name="size" value="employee" size="small" />
-                              <label for="size_small" class="text-sm">Employé</label>
+                            <label class="block text-surface-900 dark:text-surface-0 font-medium text-xl">Rôle</label>
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-2">
+                                    <RadioButton v-model="role" inputId="size_normal" name="size" value="employee" size="small" />
+                                    <label for="size_small" class="text-sm">Employé</label>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <RadioButton v-model="role" inputId="size_normal" name="size" value="administrateur" size="small" />
+                                    <label for="size_small" class="text-sm">Administrateur</label>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-2">
-                              <RadioButton v-model="role" inputId="size_normal" name="size" value="administrateur" size="small" />
-                              <label for="size_small" class="text-sm">Administrateur</label>
-                            </div>
-                          </div>
                         </div>
 
                         <div class="flex items-center justify-between mt-2 mb-8 gap-8">

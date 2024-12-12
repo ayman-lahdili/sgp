@@ -1,19 +1,16 @@
-
-<template>
-    <Pump></Pump>
-</template>
-
 <script>
 import Pump from './Pump.vue';
 
 export default {
     components: {
-        Pump,
+        Pump
     },
     data() {
-        return {
-
-        };
+        return {};
     }
 };
 </script>
+
+<template>
+    <Pump></Pump>
+</template>

@@ -1,3 +1,40 @@
+<script>
+import { useToast } from 'primevue/usetoast';
+
+export default {
+    data() {
+        return {
+            settings: {
+                gasPrice: 140.23, // Prix de l'essence par défaut
+                tps: 5, // TPS par défaut en %
+                tvq: 9.975 // TVQ par défaut en %
+            },
+            showConfirmationDialog: false,
+            toast: null
+        };
+    },
+    mounted() {
+        this.toast = useToast();
+    },
+    methods: {
+        saveSettings() {
+            // Ouvrir la boîte de dialogue pour confirmer l'enregistrement des modifications
+            this.showConfirmationDialog = true;
+        },
+        confirmSaveSettings() {
+            // Enregistrer les paramètres
+            this.showConfirmationDialog = false;
+
+            // Afficher une notification de succès
+            this.toast.add({ severity: 'success', summary: 'Paramètres sauvegardés', detail: 'Les modifications ont été enregistrées avec succès.', life: 3000 });
+
+            // Optionnel: vous pouvez envoyer ces valeurs à un serveur pour les stocker
+            console.log('Paramètres enregistrés:', this.settings);
+        }
+    }
+};
+</script>
+
 <template>
     <div class="flex justify-center items-center">
         <div class="card w-full sm:w-8 max-w-3xl">
@@ -41,43 +78,6 @@
     </Dialog>
 </template>
 
-<script>
-import { useToast } from 'primevue/usetoast';
-
-export default {
-    data() {
-        return {
-            settings: {
-                gasPrice: 140.23, // Prix de l'essence par défaut
-                tps: 5,           // TPS par défaut en %
-                tvq: 9.975        // TVQ par défaut en %
-            },
-            showConfirmationDialog: false,
-            toast: null
-        };
-    },
-    mounted() {
-        this.toast = useToast();
-    },
-    methods: {
-        saveSettings() {
-            // Ouvrir la boîte de dialogue pour confirmer l'enregistrement des modifications
-            this.showConfirmationDialog = true;
-        },
-        confirmSaveSettings() {
-            // Enregistrer les paramètres
-            this.showConfirmationDialog = false;
-
-            // Afficher une notification de succès
-            this.toast.add({ severity: 'success', summary: 'Paramètres sauvegardés', detail: 'Les modifications ont été enregistrées avec succès.', life: 3000 });
-
-            // Optionnel: vous pouvez envoyer ces valeurs à un serveur pour les stocker
-            console.log('Paramètres enregistrés:', this.settings);
-        }
-    }
-};
-</script>
-
 <style scoped>
 /* Centrer les éléments au milieu de l'écran */
 .flex {
@@ -101,5 +101,4 @@ export default {
 .field {
     margin-bottom: 16px;
 }
-
 </style>
