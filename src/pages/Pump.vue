@@ -9,9 +9,11 @@ export default {
                 { id: 'R002', capacity: 3000, current_level: 2000 }
             ],
             pumps: [
-                { id: 'P001', status: 'Activé', type: 'Normal', reservoir: 'R001', fuel_level: 0, motor_state: 'Activé', amount_pumped: 0, current_trx_id: 'T0000001' },
+                { id: 'P001', status: 'Activé', type: 'Normal', reservoir: 'R001', fuel_level: 0, motor_state: 'Désactivé', amount_pumped: 0, current_trx_id: 'T0000001' },
                 { id: 'P002', status: 'Désactivé', type: 'Sophistiqué', reservoir: 'R002', fuel_level: 0, motor_state: 'Désactivé', amount_pumped: 0, current_trx_id: 'T0000002' },
-                { id: 'P003', status: 'Transaction en attente', type: 'Sophistiqué', reservoir: 'R002', fuel_level: 0, motor_state: 'Désactivé', amount_pumped: 20, current_trx_id: 'T0000003' }
+                { id: 'P003', status: 'Transaction en attente', type: 'Sophistiqué', reservoir: 'R002', fuel_level: 0, motor_state: 'Activé', amount_pumped: 21, current_trx_id: 'T0000003' },
+                { id: 'P004', status: 'Transaction en attente', type: 'Sophistiqué', reservoir: 'R001', fuel_level: 0, motor_state: 'Activé', amount_pumped: 12, current_trx_id: 'T0000004' },
+                { id: 'P005', status: 'Transaction en attente', type: 'Normal', reservoir: 'R001', fuel_level: 0, motor_state: 'Activé', amount_pumped: 13, current_trx_id: 'T0000005' },
             ],
             selectedPump: null,
             deletePumpDialog: false,
@@ -21,11 +23,12 @@ export default {
             pump: {},
             submitted: false,
             PaymentDialog: false,
-            paymentMethod: null,
             paymentDetails: {
                 cardNumber: '',
                 clientEmail: '',
-                amount: null
+                amount: null,
+                printReceipt: false,
+                method: '',
             },
             gasPrice: 140.23,
             incidentDialog: false,
@@ -35,8 +38,12 @@ export default {
                 observations: '',
                 amount: 0
             },
-            submitted: false
+            submitted: false,
+            jetonToCAD: 20,
         };
+    },
+    beforeMount() {
+        console.log(localStorage.getItem('user'));
     },
     mounted() {
         this.toast = useToast();
@@ -75,7 +82,7 @@ export default {
                 if (reservoir) {
                     // Calculate the fuel level as a percentage
                     pump.fuel_level = Math.floor((reservoir.current_level / reservoir.capacity) * 100);
-                    if (pump.fuel_level < 4) {
+                    if (pump.fuel_level < 4 && !pump.status === 'Transaction en attente' ) {
                         pump.status = 'Désactivé';
                         pump.motor_state = 'Désactivé';
                     }
@@ -104,6 +111,8 @@ export default {
         payPump() {
             this.PaymentDialog = true;
             this.paymentDetails.amount = (this.gasPrice * this.selectedPump.amount_pumped) / 100;
+            this.paymentDetails.points = Math.floor(this.paymentDetails.amount / 5);
+            this.paymentDetails.jeton = this.paymentDetails.amount * this.jetonToCAD;
         },
         processPayment() {
             if (!this.paymentDetails.amount) {
@@ -111,7 +120,7 @@ export default {
                 return;
             }
 
-            switch (this.paymentMethod) {
+            switch (this.paymentDetails.method) {
                 case 'credit-card':
                     if (!this.paymentDetails.cardNumber) {
                         this.toast.add({ severity: 'error', summary: 'Erreur', detail: 'Numéro de carte manquant.', life: 3000 });
@@ -140,12 +149,14 @@ export default {
             // Close the dialog and reset payment details
             this.PaymentDialog = false;
             this.selectedPump.status = 'Désactivé';
+            this.selectedPump.motor_state = 'Désactivé';
             this.selectedPump.amount_pumped = 0;
-            this.paymentMethod = null;
             this.paymentDetails = {
                 cardNumber: '',
+                method: '',
                 clientEmail: '',
-                amount: null
+                amount: null,
+                printReceipt: false,
             };
         },
         deleteSelectedPump() {
@@ -227,6 +238,14 @@ export default {
                         case 'Désactivé':
                             return 'danger';
                     }
+            }
+        },
+        resetPayment() {
+            this.paymentDetails = {
+                cardNumber: '',
+                clientEmail: '',
+                amount: null,
+                printReceipt: false,
             }
         }
     }
@@ -348,33 +367,72 @@ export default {
                     <span class="block font-bold mb-4">Mode de paiement</span>
                     <div class="grid grid-cols-12 gap-4">
                         <div class="flex items-center gap-2 col-span-4">
-                            <RadioButton id="credit-card" v-model="paymentMethod" name="payment" value="credit-card" />
+                            <RadioButton id="credit-card" v-model="paymentDetails.method" name="payment" value="credit-card" />
                             <label for="credit-card">Carte Crédit</label>
                         </div>
                         <div class="flex items-center gap-2 col-span-4">
-                            <RadioButton id="cash" v-model="paymentMethod" name="payment" value="cash" />
+                            <RadioButton id="cash" v-model="paymentDetails.method" name="payment" value="cash" />
                             <label for="cash">Argent Comptant</label>
                         </div>
                         <div class="flex items-center gap-2 col-span-4">
-                            <RadioButton id="client-account" v-model="paymentMethod" name="payment" value="client-account" />
+                            <RadioButton id="client-account" v-model="paymentDetails.method" name="payment" value="client-account" />
                             <label for="client-account">Compte Client</label>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="paymentMethod === 'credit-card'">
-                    <label for="card-number" class="block font-bold mb-3">Numéro de Carte</label>
-                    <InputText id="card-number" v-model="paymentDetails.cardNumber" placeholder="XXXX-XXXX-XXXX-XXXX" />
+                <div v-if="paymentDetails.method === 'credit-card'" class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="card-number" class="block font-bold mb-3">Numéro de Carte</label>
+                        <InputText id="card-number" v-model="paymentDetails.cardNumber" placeholder="XXXX-XXXX-XXXX-XXXX" />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="card-expiry" class="block font-bold mb-3">Date d'Expiration</label>
+                        <InputText id="card-expiry" v-model="paymentDetails.cardExpiry" placeholder="MM/AA" />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="card-cvv" class="block font-bold mb-3">CVV</label>
+                        <InputText id="card-cvv" v-model="paymentDetails.cardCvv" placeholder="XXX" type="password" />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="card-holder" class="block font-bold mb-3">Titulaire de la Carte</label>
+                        <InputText id="card-holder" v-model="paymentDetails.cardHolder" placeholder="Nom du Titulaire" />
+                    </div>
                 </div>
 
-                <div v-if="paymentMethod === 'client-account'">
-                    <label for="client-email" class="block font-bold mb-3">Courriel du Client</label>
-                    <InputText id="client-email" v-model="paymentDetails.clientEmail" placeholder="email@example.com" />
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="amount" class="block font-bold mb-3">Montant</label>
+                        <InputNumber v-if="paymentDetails.method !== 'client-account'" id="amount" v-model="paymentDetails.amount" mode="currency" currency="USD" disabled />
+                        <InputNumber v-else id="amount" v-model="paymentDetails.jeton" suffix=" jetons" disabled />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="quantity" class="block font-bold mb-3">Quantité Pompée</label>
+                        <InputNumber id="quantity" v-model="selectedPump.amount_pumped" suffix=" L" disabled />
+                    </div>
                 </div>
 
-                <div>
-                    <label for="amount" class="block font-bold mb-3">Montant</label>
-                    <InputNumber id="amount" v-model="paymentDetails.amount" mode="currency" currency="USD" />
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="client-email" class="block font-bold mb-3">{{(paymentDetails.method === 'client-account') ? 'Courriel du Client': 'Courriel du Client (Optionnel)'}}</label>
+                        <InputText id="client-email" v-model="paymentDetails.clientEmail" placeholder="email@example.com" />
+                    </div>
+                    <div v-if="paymentDetails.clientEmail" class="col-span-6">
+                        <label for="tokens-earned" class="block font-bold mb-3">Jetons Gagnés</label>
+                        <InputNumber 
+                            id="tokens-earned" 
+                            v-model="paymentDetails.points"
+                            disabled 
+                            suffix=" jetons" 
+                        />
+                    </div>
+                </div>
+
+                <!-- Section pour le courriel et les jetons -->
+
+                <div class="flex items-center gap-2 mt-4">
+                    <Checkbox id="print-receipt" v-model="paymentDetails.printReceipt" binary />
+                    <label for="print-receipt" class="font-bold">Imprimer le reçu</label>
                 </div>
             </div>
 
@@ -388,9 +446,11 @@ export default {
                         resetPayment();
                     "
                 />
-                <Button label="Payer et imprimer le reçu" icon="pi pi-check" @click="processPayment" />
+                <Button label="Payer" icon="pi pi-check" @click="processPayment" />
             </template>
         </Dialog>
+
+
         <Dialog v-model:visible="deletePumpDialog" :style="{ width: '450px' }" header="Confirmer" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
