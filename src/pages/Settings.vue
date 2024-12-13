@@ -7,7 +7,9 @@ export default {
             settings: {
                 gasPrice: 140.23, // Prix de l'essence par défaut
                 tps: 5, // TPS par défaut en %
-                tvq: 9.975 // TVQ par défaut en %
+                tvq: 9.975, // TVQ par défaut en %
+                tokensPerCAD: 10, // Conversion par défaut des jetons pour 1 CAD
+                tokensPerGasDollar: 2 // Nombre de jetons par dollar d'essence par défaut
             },
             showConfirmationDialog: false,
             toast: null
@@ -55,6 +57,18 @@ export default {
                 <div class="field">
                     <label for="tvq" class="block font-bold">TVQ (%)</label>
                     <InputNumber id="tvq" v-model="settings.tvq" mode="decimal" :min="0" :max="100" />
+                </div>
+
+                <!-- Conversion des jetons pour 1 CAD -->
+                <div class="field">
+                    <label for="tokens-per-cad" class="block font-bold">Jetons par 1 CAD</label>
+                    <InputNumber id="tokens-per-cad" v-model="settings.tokensPerCAD" mode="decimal" :min="0" />
+                </div>
+
+                <!-- Nombre de jetons alloués par dollar d'essence -->
+                <div class="field">
+                    <label for="tokens-per-gas-dollar" class="block font-bold">Jetons par dollar d'essence</label>
+                    <InputNumber id="tokens-per-gas-dollar" v-model="settings.tokensPerGasDollar" mode="decimal" :min="0" />
                 </div>
             </div>
 

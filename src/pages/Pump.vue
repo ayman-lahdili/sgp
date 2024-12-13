@@ -13,7 +13,7 @@ export default {
                 { id: 'P002', status: 'Désactivé', type: 'Sophistiqué', reservoir: 'R002', fuel_level: 0, motor_state: 'Désactivé', amount_pumped: 0, current_trx_id: 'T0000002' },
                 { id: 'P003', status: 'Transaction en attente', type: 'Sophistiqué', reservoir: 'R002', fuel_level: 0, motor_state: 'Activé', amount_pumped: 21, current_trx_id: 'T0000003' },
                 { id: 'P004', status: 'Transaction en attente', type: 'Sophistiqué', reservoir: 'R001', fuel_level: 0, motor_state: 'Activé', amount_pumped: 12, current_trx_id: 'T0000004' },
-                { id: 'P005', status: 'Transaction en attente', type: 'Normal', reservoir: 'R001', fuel_level: 0, motor_state: 'Activé', amount_pumped: 13, current_trx_id: 'T0000005' },
+                { id: 'P005', status: "En court d'utilisation", type: 'Normal', reservoir: 'R001', fuel_level: 0, motor_state: 'Activé', amount_pumped: 13, current_trx_id: 'T0000005' }
             ],
             selectedPump: null,
             deletePumpDialog: false,
@@ -28,7 +28,7 @@ export default {
                 clientEmail: '',
                 amount: null,
                 printReceipt: false,
-                method: '',
+                method: ''
             },
             gasPrice: 140.23,
             incidentDialog: false,
@@ -39,7 +39,7 @@ export default {
                 amount: 0
             },
             submitted: false,
-            jetonToCAD: 20,
+            jetonToCAD: 20
         };
     },
     beforeMount() {
@@ -82,7 +82,7 @@ export default {
                 if (reservoir) {
                     // Calculate the fuel level as a percentage
                     pump.fuel_level = Math.floor((reservoir.current_level / reservoir.capacity) * 100);
-                    if (pump.fuel_level < 4 && !pump.status === 'Transaction en attente' ) {
+                    if (pump.fuel_level < 4 && !pump.status === 'Transaction en attente') {
                         pump.status = 'Désactivé';
                         pump.motor_state = 'Désactivé';
                     }
@@ -156,7 +156,7 @@ export default {
                 method: '',
                 clientEmail: '',
                 amount: null,
-                printReceipt: false,
+                printReceipt: false
             };
         },
         deleteSelectedPump() {
@@ -203,6 +203,7 @@ export default {
                 transactionNumber: '',
                 observations: ''
             };
+            this.selectedPump.status = 'Désactivé';
             this.submitted = false;
         },
         activatePump() {
@@ -230,6 +231,8 @@ export default {
                             return 'danger';
                         case 'Transaction en attente':
                             return 'warn';
+                        case "En court d'utilisation":
+                            return 'info';
                     }
                 case 'motor_state':
                     switch (value) {
@@ -245,8 +248,8 @@ export default {
                 cardNumber: '',
                 clientEmail: '',
                 amount: null,
-                printReceipt: false,
-            }
+                printReceipt: false
+            };
         }
     }
 };
@@ -414,17 +417,12 @@ export default {
 
                 <div class="grid grid-cols-12 gap-4">
                     <div class="col-span-6">
-                        <label for="client-email" class="block font-bold mb-3">{{(paymentDetails.method === 'client-account') ? 'Courriel du Client': 'Courriel du Client (Optionnel)'}}</label>
+                        <label for="client-email" class="block font-bold mb-3">{{ paymentDetails.method === 'client-account' ? 'Courriel du Client' : 'Courriel du Client (Optionnel)' }}</label>
                         <InputText id="client-email" v-model="paymentDetails.clientEmail" placeholder="email@example.com" />
                     </div>
                     <div v-if="paymentDetails.clientEmail" class="col-span-6">
                         <label for="tokens-earned" class="block font-bold mb-3">Jetons Gagnés</label>
-                        <InputNumber 
-                            id="tokens-earned" 
-                            v-model="paymentDetails.points"
-                            disabled 
-                            suffix=" jetons" 
-                        />
+                        <InputNumber id="tokens-earned" v-model="paymentDetails.points" disabled suffix=" jetons" />
                     </div>
                 </div>
 
@@ -449,7 +447,6 @@ export default {
                 <Button label="Payer" icon="pi pi-check" @click="processPayment" />
             </template>
         </Dialog>
-
 
         <Dialog v-model:visible="deletePumpDialog" :style="{ width: '450px' }" header="Confirmer" :modal="true">
             <div class="flex items-center gap-4">

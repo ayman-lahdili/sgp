@@ -40,6 +40,12 @@ const router = createRouter({
                     meta: { requiresAuth: true } // Authentification requise pour Transactions
                 },
                 {
+                    path: '/clients',
+                    name: 'clients',
+                    component: () => import('@/pages/Clients.vue'),
+                    meta: { requiresAuth: true } // Authentification requise pour Transactions
+                },
+                {
                     path: '/users',
                     name: 'users',
                     component: () => import('@/pages/Users.vue'),

@@ -72,15 +72,15 @@ export default {
             <template #header>
                 <div class="flex justify-between">
                     <div class="flex justify-between">
-                        <Button type="button" icon="pi pi-filter-slash" class="mr-2" label="Clear" outlined @click="clearFilter()" />
+                        <Button type="button" icon="pi pi-filter-slash" class="mr-2" label="Effacer" outlined @click="clearFilter()" />
                         <IconField>
                             <InputIcon>
                                 <i class="pi pi-search" />
                             </InputIcon>
-                            <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+                            <InputText v-model="filters['global'].value" placeholder="Rechercher..." />
                         </IconField>
                     </div>
-                    <Button icon="pi pi-user-plus" label="Add User" @click="showAddUserDialog" />
+                    <Button icon="pi pi-user-plus" label="Ajouter un Utilisateur" @click="showAddUserDialog" />
                 </div>
             </template>
 

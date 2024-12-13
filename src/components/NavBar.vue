@@ -42,18 +42,27 @@ export default {
                     }
                 },
                 {
+                    label: 'Clients',
+                    icon: 'pi pi-fw pi-users',
+                    command: () => {
+                        this.$router.push('/clients');
+                    }
+                },
+                {
                     label: 'Utilisateur',
                     icon: 'pi pi-fw pi-users',
                     command: () => {
                         this.$router.push('/users');
-                    }
+                    },
+                    visible: false // Par défaut, cet élément est caché
                 },
                 {
                     label: 'Paramètre',
                     icon: 'pi pi-fw pi-cog',
                     command: () => {
                         this.$router.push('/settings');
-                    }
+                    },
+                    visible: false // Par défaut, cet élément est caché
                 },
                 {
                     label: '',
@@ -84,8 +93,18 @@ export default {
                 observations: ''
             },
             submitted: false,
-            toast: null
+            toast: null,
+            isAdmin: false
         };
+    },
+    beforeMount() {
+        this.isAdmin = localStorage.getItem('role') === 'administrateur';
+        // Mettez à jour la visibilité des éléments selon le rôle de l'utilisateur
+        this.items.forEach((item) => {
+            if (item.label === 'Utilisateur' || item.label === 'Paramètre') {
+                item.visible = this.isAdmin; // Afficher si l'utilisateur est un admin
+            }
+        });
     },
     mounted() {
         this.toast = useToast();
@@ -126,7 +145,7 @@ export default {
 
 <template>
     <div class="card">
-        <Menubar :model="items">
+        <Menubar :model="items.filter((item) => item.visible !== false)">
             <template #end>
                 <div class="flex items-center gap-2">
                     <Button label="Signaler un incident" severity="danger" variant="outlined" size="normal" @click="incidentDialog = true" />
