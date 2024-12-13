@@ -42,6 +42,13 @@ export default {
                     }
                 },
                 {
+                    label: 'Incident',
+                    icon: 'pi pi-fw pi-alert',
+                    command: () => {
+                        this.$router.push('/incidents');
+                    }
+                },
+                {
                     label: 'Clients',
                     icon: 'pi pi-fw pi-users',
                     command: () => {
