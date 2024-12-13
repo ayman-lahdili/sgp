@@ -1,10 +1,7 @@
 <script setup>
 import FooterComponent from '@/components/FooterComponent.vue';
 import NavBar from '@/components/NavBar.vue';
-import { useLayout } from '@/layout/composables/layout';
 import { computed } from 'vue';
-
-const { layoutConfig, layoutState } = useLayout();
 
 const containerClass = computed(() => {
     return {

@@ -38,7 +38,6 @@ export default {
                 observations: '',
                 amount: 0
             },
-            submitted: false,
             jetonToCAD: 20
         };
     },
@@ -223,6 +222,7 @@ export default {
                         case 'Sophistiqué':
                             return 'warn';
                     }
+                    break;
                 case 'status':
                     switch (value) {
                         case 'Activé':
@@ -234,6 +234,7 @@ export default {
                         case "En court d'utilisation":
                             return 'info';
                     }
+                    break;
                 case 'motor_state':
                     switch (value) {
                         case 'Activé':
@@ -241,6 +242,7 @@ export default {
                         case 'Désactivé':
                             return 'danger';
                     }
+                    break;
             }
         },
         resetPayment() {
